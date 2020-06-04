@@ -152,6 +152,14 @@
                 </pl-table-column>
                 <pl-table-column
                     :show-overflow-tooltip="true"
+                    prop="hashStatus"
+                    label="存证状态"
+                    align="center"
+                >
+                    <!-- <template slot-scope="scope"> {{scope.row.hashStatus==''?'未存证':(scope.row.hashStatus==0?'存证失败':(scope.row.hashStatus==2?'已存证':'存证中'))}}</template> -->
+                </pl-table-column>
+                <pl-table-column
+                    :show-overflow-tooltip="true"
                     prop="goods_CD"
                     width="150"
                     label="商品编码"
@@ -273,14 +281,6 @@
                     label="备注"
                     align="center"
                 ></pl-table-column>
-                <pl-table-column
-                    :show-overflow-tooltip="true"
-                    prop="hashStatus"
-                    label="存证状态"
-                    align="center"
-                >
-                    <!-- <template slot-scope="scope"> {{scope.row.hashStatus==''?'未存证':(scope.row.hashStatus==0?'存证失败':(scope.row.hashStatus==2?'已存证':'存证中'))}}</template> -->
-                </pl-table-column>
 
                 <pl-table-column label="操作" align="center" fixed="right">
                     <template slot-scope="scope">
@@ -401,7 +401,7 @@
                         <el-input v-model="tagData.goodsSlot"></el-input>
                     </el-form-item>
                     <el-form-item label="商品价格(元):" prop="goodsPrice">
-                        <el-input v-model="tagData.goodsPrice" type="number"></el-input>
+                        <el-input v-model="tagData.goodsPrice" @input="changeinput"></el-input>
                     </el-form-item>
                     <el-form-item label="备注:" prop="memo">
                         <el-input v-model="tagData.memo"></el-input>
@@ -612,6 +612,12 @@ export default {
         this.showAllCompNameIDInfo();
     },
     methods: {
+        changeinput(e) {
+            let reg = /^\d+(\.\d+)?$/;
+            if (!reg.test(e)) {
+                this.tagData.goodsPrice = '';
+            }
+        },
         getCompName(val) {
             if (val != null) {
                 this.queryForm.compName = val.comp_Name;

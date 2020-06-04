@@ -159,6 +159,13 @@
                     </template>
                 </pl-table-column>
                 <pl-table-column
+                    prop="hashStatus"
+                    label="存证状态"
+                    width="150"
+                    show-overflow-tooltip
+                    align="center"
+                ></pl-table-column>
+                <pl-table-column
                     prop="goods_CD"
                     label="商品编码"
                     width="150"
@@ -239,13 +246,7 @@
                     show-overflow-tooltip
                     align="center"
                 ></pl-table-column>
-                <pl-table-column
-                    prop="hashStatus"
-                    label="存证状态"
-                    width="150"
-                    show-overflow-tooltip
-                    align="center"
-                ></pl-table-column>
+
                 <pl-table-column
                     prop="address"
                     label="操作"
@@ -614,8 +615,8 @@
                     <el-form-item label="商品价格:" prop="goods_pric">
                         <el-input
                             v-model="tagBindForm.goods_pric"
+                            @input="goodsInput"
                             style="width:150px"
-                            type="number"
                         ></el-input>
                     </el-form-item>
                     <el-form-item label="商品备注:" prop="goods_memo">
@@ -939,6 +940,12 @@ export default {
         this.showAllCompNameIDInfo();
     },
     methods: {
+        goodsInput(e) {
+            let reg = /^\d+(\.\d+)?$/;
+            if (!reg.test(e)) {
+                this.tagBindForm.goods_pric = '';
+            }
+        },
         handleDeleteBindData(index, row) {
             this.$confirm('此操作将解绑该条标签, 是否继续?', '提示', {
                 confirmButtonText: '确定',

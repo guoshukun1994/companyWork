@@ -80,7 +80,7 @@
 
                         <img
                             :src="logo"
-                            style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;background:lightgray;"
+                            style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;"
                         />
                     </div>
                 </el-form-item>
@@ -106,11 +106,36 @@
 
                         <img
                             :src="photo"
-                            style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;background:lightgray"
+                            style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;"
                         />
                     </div>
                 </el-form-item>
-
+                <el-form-item class="compPublic">
+                    <el-upload
+                        :on-remove="handleRemoveThree"
+                        :auto-upload="false"
+                        :on-change="handleChangeThree"
+                        :file-list="publicList"
+                        :limit="1"
+                        class="upload-demo"
+                        action
+                        list-type="picture"
+                    >
+                        <el-button
+                            @click="publicBut"
+                            size="small"
+                            type="primary"
+                            style="width:350px"
+                            >上传企业公众号</el-button
+                        >
+                    </el-upload>
+                    <div :class="{ publicActive: ispublicActive }">
+                        <img
+                            :src="public"
+                            style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;"
+                        />
+                    </div>
+                </el-form-item>
                 <!-- <el-form-item>
                     <el-button @click="submitForm('ruleForm')" type="primary">立即创建</el-button>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -161,12 +186,15 @@ export default {
             },
             logoList: [],
             photoList: [],
+            publicList: [],
             logo: '',
             photo: '',
+            public: '',
             compCD: '',
             loading: false,
             islogoActive: false,
             isphotoActive: false,
+            ispublicActive: false,
             rules: {
                 compCd: [
                     {
@@ -348,6 +376,8 @@ export default {
                         formData.append('compURL', this.ruleForm.compURL);
                         formData.append('logo', this.logo);
                         formData.append('photo', this.photo);
+                        formData.append('public', this.public);
+                        console.log('public', this.public);
                         compRegister(formData, this.$store.getters.token).then((res) => {
                             this.loading = false;
                             if (res.code === 1) {
@@ -361,7 +391,7 @@ export default {
                                 this.photo = '';
                                 this.photoList = [];
                                 this.logoList = [];
-
+                                this.publicList = [];
                                 this.$store
                                     .dispatch('user/logout', this.$store.getters.token)
                                     .then(() => {
@@ -432,8 +462,10 @@ export default {
             this.photo = '';
             this.logoList = [];
             this.photoList = [];
+            this.publicList = [];
             this.islogoActive = true;
             this.isphotoActive = true;
+            this.ispublicActive = true;
         },
         handleRemoveOne(file, fileList) {
             this.logo = '';
@@ -445,7 +477,6 @@ export default {
             const isIMAGE4 = file.raw.type === 'image/jpeg';
             const isIMAGE5 = file.raw.type === 'image/tiff';
             const isLt1M = file.raw.size / 1024 / 1024 < 1.5;
-
             if (!isIMAGE1 && !isIMAGE2 && !isIMAGE3 && !isIMAGE4 && !isIMAGE5) {
                 this.$message.error('只支持png,jpg,jpeg,tiff,gif格式的图片!');
                 this.logoList = [];
@@ -463,9 +494,11 @@ export default {
             this.photo = '';
         },
         logoBut() {
+            this.logo = '';
             this.islogoActive = true;
         },
         photoBut() {
+            this.photo = '';
             this.isphotoActive = true;
         },
         handleChangeTwo(file, fileList) {
@@ -478,32 +511,73 @@ export default {
 
             if (!isIMAGE1 && !isIMAGE2 && !isIMAGE3 && !isIMAGE4 && !isIMAGE5) {
                 this.$message.error('只支持png,jpg,jpeg,tiff,gif格式的图片!');
-                this.logoList = [];
+                this.photoList = [];
                 return false;
             }
             if (!isLt1M) {
                 this.$message.error('上传文件大小不能超过 1.5MB!');
-                this.logoList = [];
+                this.photoList = [];
                 return false;
             }
             this.photo = file.raw;
         },
+        // 公众号
+        handleChangeThree(file, fileList) {
+            const isIMAGE1 = file.raw.type === 'image/png';
+            const isIMAGE2 = file.raw.type === 'image/gif';
+            const isIMAGE3 = file.raw.type === 'image/jpg';
+            const isIMAGE4 = file.raw.type === 'image/jpeg';
+            const isIMAGE5 = file.raw.type === 'image/tiff';
+            const isLt1M = file.raw.size / 1024 / 1024 < 1.5;
+            if (!isIMAGE1 && !isIMAGE2 && !isIMAGE3 && !isIMAGE4 && !isIMAGE5) {
+                this.$message.error('只支持png,jpg,jpeg,tiff,gif格式的图片!');
+                this.publicList = [];
+                return false;
+            }
+            if (!isLt1M) {
+                this.$message.error('上传文件大小不能超过 1.5MB!');
+                this.publicList = [];
+                return false;
+            }
+            this.public = file.raw;
+        },
+        handleRemoveThree(file, fileList) {
+            this.public = '';
+        },
+        publicBut() {
+            this.public = '';
+            this.ispublicActive = true;
+        },
         getcompDetailsInfo() {
             compDetailsNotRegistered({ compCD: this.compCD }, this.$store.getters.token).then(
                 (res) => {
-                    this.ruleForm.compCd = res[0].comp_CD;
-                    this.ruleForm.compName = res[0].comp_Name;
-                    this.ruleForm.compSimp = res[0].comp_Simp_Name;
-                    this.ruleForm.address = res[0].comp_Address;
-                    this.ruleForm.compLeader = res[0].comp_Leader;
-                    this.ruleForm.compContact = res[0].comp_Contact;
-                    this.ruleForm.contPhone = res[0].cont_Phone;
-                    this.ruleForm.compDescribe = res[0].comp_Describe;
-                    this.ruleForm.compBussScope = res[0].comp_Buss_Scope;
-                    this.ruleForm.compURL = res[0].comp_URL;
-                    this.ruleForm.leaderPhone = res[0].leader_Phone;
-                    this.logo = res[0].comp_Logo;
-                    this.photo = res[0].comp_Photo;
+                    if (res.length === 0) {
+                        this.islogoActive = true;
+                        this.isphotoActive = true;
+                        this.ispublicActive = true;
+                    } else {
+                        this.ruleForm.compCd = res[0].comp_CD;
+                        this.ruleForm.compName = res[0].comp_Name;
+                        this.ruleForm.compSimp = res[0].comp_Simp_Name;
+                        this.ruleForm.address = res[0].comp_Address;
+                        this.ruleForm.compLeader = res[0].comp_Leader;
+                        this.ruleForm.compContact = res[0].comp_Contact;
+                        this.ruleForm.contPhone = res[0].cont_Phone;
+                        this.ruleForm.compDescribe = res[0].comp_Describe;
+                        this.ruleForm.compBussScope = res[0].comp_Buss_Scope;
+                        this.ruleForm.compURL = res[0].comp_URL;
+                        this.ruleForm.leaderPhone = res[0].leader_Phone;
+                        this.logo = res[0].comp_Logo;
+                        this.photo = res[0].comp_Photo;
+                        this.public = res[0].comp_Public;
+                        this.logo === '' ? (this.islogoActive = true) : (this.islogoActive = false);
+                        this.photo === ''
+                            ? (this.isphotoActive = true)
+                            : (this.isphotoActive = false);
+                        this.public === ''
+                            ? (this.ispublicActive = true)
+                            : (this.ispublicActive = false);
+                    }
                 }
             );
         }
@@ -517,6 +591,9 @@ export default {
         display: none;
     }
     .photoActive {
+        display: none;
+    }
+    .publicActive {
         display: none;
     }
     &-title {
@@ -565,6 +642,11 @@ export default {
             width: 350px;
             margin-left: 100px;
         }
+    }
+    .compPublic {
+        // display: inline;
+        width: 350px;
+        margin-left: 100px;
     }
 }
 </style>

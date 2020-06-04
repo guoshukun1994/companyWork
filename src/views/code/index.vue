@@ -124,6 +124,10 @@
                 >标签存证</el-button
             >
             <ExportCode :codeData="multipleSelection" style="display:inline"></ExportCode>
+            <ExportWechatCode
+                :weChatCodeData="multipleSelection"
+                style="display:inline"
+            ></ExportWechatCode>
             <BulkDel
                 :deleteData="multipleSelection"
                 @childDe="childDe"
@@ -134,11 +138,11 @@
             <BulkRe
                 :reData="multipleSelection"
                 @childRe="childRe"
-                style="display:inline"
                 @getInfo1="getInfo1"
                 @getInfo2="getInfo2"
                 @changeDel1="changeDel1"
                 @changeDel2="changeDel2"
+                style="display:inline"
             ></BulkRe>
             <BulkExc :excelData="multipleSelection" style="display:inline"></BulkExc>
 
@@ -179,6 +183,16 @@
                                 scope.$index + (queryForm.pageNum - 1) * queryForm.pageSize + 1
                             }}</span>
                         </template>
+                    </pl-table-column>
+                    <pl-table-column
+                        :show-overflow-tooltip="true"
+                        label="存证状态"
+                        align="center"
+                        width="80"
+                        ><template v-slot="scope">
+                            {{ scope.row.hashStatus }}
+                        </template>
+                        <!-- <template slot-scope="scope"> {{scope.row.hashStatus==''?'未存证':(scope.row.hashStatus==0?'存证失败':(scope.row.hashStatus==2?'已存证':'存证中'))}}</template> -->
                     </pl-table-column>
                     <pl-table-column label="商品编码" width="150" align="center">
                         <template v-slot="scope">
@@ -321,16 +335,7 @@
                             scope.row.consume_Status === '0' ? '未消费' : '已消费'
                         }}</template>
                     </pl-table-column>
-                    <pl-table-column
-                        :show-overflow-tooltip="true"
-                        label="存证状态"
-                        align="center"
-                        width="80"
-                        ><template v-slot="scope">
-                            {{ scope.row.hashStatus }}
-                        </template>
-                        <!-- <template slot-scope="scope"> {{scope.row.hashStatus==''?'未存证':(scope.row.hashStatus==0?'存证失败':(scope.row.hashStatus==2?'已存证':'存证中'))}}</template> -->
-                    </pl-table-column>
+
                     <pl-table-column label="操作" align="center" width="80" fixed="right">
                         <template slot-scope="scope">
                             <el-button
@@ -350,6 +355,7 @@
 <script>
 import { searchBar, delBindingBar, synInput } from '../../api/api';
 import ExportCode from '../exportcode/ExportCode';
+import ExportWechatCode from '../exportcode/ExportWechatCode';
 import BulkDel from './BulkDel';
 import BulkRe from './BulkRe';
 import BulkExc from './BulkExc';
@@ -357,6 +363,7 @@ import BulkExc from './BulkExc';
 export default {
     components: {
         ExportCode,
+        ExportWechatCode,
         BulkDel,
         BulkRe,
         BulkExc
@@ -419,7 +426,7 @@ export default {
             this.selectRow = [];
             if (data.length > 0) {
                 data.forEach((item, index) => {
-                    console.log('1111', item);
+                    // console.log('1111', item);
                     this.selectRow.push(this.codeInfo.indexOf(item));
                 });
             }
@@ -621,9 +628,17 @@ export default {
             this.loadingText = '数据加载中';
             this.queryForm.pageNum = 1;
             searchBar(this.queryForm, this.$store.getters.token).then((res) => {
-                this.tableLoading = false;
-                this.codeInfo = res.sqlValue;
-                this.totalNum = res.total[0].total;
+                if (res.code === 1) {
+                    this.tableLoading = false;
+                    this.codeInfo = res.sqlValue;
+                    this.totalNum = res.total[0].total;
+                } else if (res.code === 6) {
+                    this.$notify({
+                        title: '失败!',
+                        message: '查询异常，请联系管理员!',
+                        type: 'warning'
+                    });
+                }
             });
         },
         changePagesBar() {
@@ -632,9 +647,17 @@ export default {
             }
             this.tableLoading = true;
             searchBar(this.queryForm, this.$store.getters.token).then((res) => {
-                this.tableLoading = false;
-                this.codeInfo = res.sqlValue;
-                this.totalNum = res.total[0].total;
+                if (res.code === 1) {
+                    this.tableLoading = false;
+                    this.codeInfo = res.sqlValue;
+                    this.totalNum = res.total[0].total;
+                } else if (res.code === 6) {
+                    this.$notify({
+                        title: '失败!',
+                        message: '查询异常，请联系管理员!',
+                        type: 'warning'
+                    });
+                }
             });
         },
         handleSizeChange(val) {

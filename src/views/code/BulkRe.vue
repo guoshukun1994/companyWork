@@ -47,7 +47,9 @@ export default {
                                 type: 'success'
                             });
                             this.$emit('changeDel1', this.delRadio1);
-
+                            if (this.userType != 2) {
+                                this.compCD = localStorage.getItem('comp_CD');
+                            }
                             searchBar(
                                 { compCD: this.compCD, pageNum: 1, pageSize: 10, delFlag: '0' },
                                 this.$store.getters.token

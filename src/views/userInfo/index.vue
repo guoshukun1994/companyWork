@@ -282,7 +282,11 @@
                         <el-input v-model="addUserForm.userEmail" />
                     </el-form-item>
                     <el-form-item label="密码:" prop="newPsw">
-                        <el-input v-model="addUserForm.newPsw" type="password" />
+                        <el-input
+                            v-model="addUserForm.newPsw"
+                            type="password"
+                            auto-complete="new-password"
+                        />
                     </el-form-item>
                     <el-form-item v-if="userType != 2" label="确认密码:" prop="checkNewPsw">
                         <el-input v-model="addUserForm.checkNewPsw" type="password" />

@@ -538,6 +538,7 @@
                                     >
                                 </el-upload>
                             </el-form-item>
+
                             <el-form-item style="width:100%;">
                                 <el-button @click="dialogVisibleOne = false">关 闭</el-button>
 
@@ -944,6 +945,12 @@
                                     <img :src="compImgSrc" style="width: 100%;height: 100%;" />
                                 </div>
                             </el-form-item>
+                            <el-form-item prop="comp_URL">
+                                企业公众号图片
+                                <div style="width:350px;height:350px;">
+                                    <img :src="PublicSrc" style="width: 100%;height: 100%;" />
+                                </div>
+                            </el-form-item>
                             <!-- <img :src="logoSrc" style="max-width: 100%;max-height: 100%;margin:0 auto" />
               <img :src="compImgSrc" style="max-width: 100%;max-height: 100%;margin:0 auto" />-->
                         </el-form-item>
@@ -1038,7 +1045,12 @@
                             style="width:95%;margin:0 auto;margin-top:-20px;text-align: center;"
                         >
                             <el-form-item>
-                                <div>企业LOGO</div>
+                                <div
+                                    style="display:flex;flex-direction:raw;justify-content:center;"
+                                >
+                                    <div style="color:orange;">*&nbsp;</div>
+                                    <div>企业LOGO</div>
+                                </div>
                                 <el-upload
                                     class="upload-demo"
                                     action
@@ -1056,7 +1068,7 @@
                                         @click="editCompLogo"
                                         style="width:350px"
                                         >企业LOGO(
-                                        png/jpg/jpeg/gif/tiff,限1张,尺寸小于150*150,长宽比例为7:4)</el-button
+                                        png/jpg/jpeg/gif/tiff,限1张,尺寸小于150*150)</el-button
                                     >
                                 </el-upload>
                                 <div :class="{ logoActive: islogoActive }">
@@ -1068,8 +1080,12 @@
                             </el-form-item>
                             <el-form-item>
                                 <div>
-                                    <div>企业图片</div>
-
+                                    <div
+                                        style="display:flex;flex-direction:raw;justify-content:center;"
+                                    >
+                                        <div style="color:orange;">*&nbsp;</div>
+                                        <div>企业图片</div>
+                                    </div>
                                     <el-upload
                                         class="upload-demo"
                                         action
@@ -1086,12 +1102,43 @@
                                             type="primary"
                                             style="width:350px"
                                             @click="editCompPhoto"
-                                            >企业图片(png/jpg/jpeg/gif/tiff,限1张,尺寸小于150*150,长宽比例为7:4)</el-button
+                                            >企业图片(png/jpg/jpeg/gif/tiff,限1张,尺寸小于150*150)</el-button
                                         >
                                     </el-upload>
                                     <div :class="{ PhotoActive: isPhotoActive }">
                                         <img
                                             :src="editPhoto"
+                                            style="margin:0 auto;width:350px;height:350px;"
+                                        />
+                                    </div>
+                                </div>
+                            </el-form-item>
+                            <el-form-item>
+                                <div>
+                                    <div>企业公众号图片</div>
+
+                                    <el-upload
+                                        class="upload-demo"
+                                        action
+                                        :on-change="editPublicHandlePreview"
+                                        :on-remove="editPublicHandleRemove"
+                                        :file-list="editPublicFileList"
+                                        list-type="picture"
+                                        :auto-upload="false"
+                                        :limit="1"
+                                        style="float:right"
+                                    >
+                                        <el-button
+                                            size="small"
+                                            type="primary"
+                                            style="width:350px"
+                                            @click="editCompPublic"
+                                            >企业公众号(png/jpg/jpeg/gif/tiff,限1张)</el-button
+                                        >
+                                    </el-upload>
+                                    <div :class="{ PublicActive: isPublicActive }">
+                                        <img
+                                            :src="editPublic"
                                             style="width: 100%;height: 100%;margin:0 auto;width:350px;height:350px;"
                                         />
                                     </div>
@@ -1252,6 +1299,7 @@ export default {
             },
             editLogo: '',
             editPhoto: '',
+            editPublic: '',
             // editDisabled: true,
             businessList: [],
             infoLoading: false,
@@ -1304,8 +1352,10 @@ export default {
             // photoTwo: "",
             editLogo: '',
             editPhoto: '',
+            editPublic: '',
             logoSrc: '',
             compImgSrc: '',
+            PublicSrc: '',
             condition: '',
             companyDetails: {},
             infoDialog: {},
@@ -1449,12 +1499,14 @@ export default {
             imgLoading: false,
             islogoActive: false,
             isPhotoActive: false,
+            isPublicActive: false,
             companyDetailsLoading: false,
             companyDetailsLoadingText: '',
             loadingTwoText: '',
             loadingInfoText: '',
             editLogoFileList: [],
             editPhotoFileList: [],
+            editPublicFileList: [],
             showInfo: {},
             selectDataOne: [],
             selectRowOne: [],
@@ -1474,6 +1526,11 @@ export default {
                 return this.changeTimestamp(timestamp);
             };
         }
+        // isPublicActive() {
+        //     console.log(this.editPublic ? true : false);
+
+        //     return this.editPublic ? true : false;
+        // }
     },
     watch: {
         selectDataOne(data) {
@@ -1500,12 +1557,29 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
+                    if (this.editLogo === '') {
+                        this.$notify({
+                            title: '失败!',
+                            message: '请上传企业LOGO',
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    if (this.editPhoto === '') {
+                        this.$notify({
+                            title: '失败!',
+                            message: '请上传企业图片',
+                            type: 'warning'
+                        });
+                        return;
+                    }
                     this.editoadingText = '资料更新中';
                     this.editLoading = true;
                     const formData = new FormData();
                     formData.append('companyMessage', JSON.stringify(this.editData));
                     formData.append('logo', this.editLogo);
                     formData.append('photo', this.editPhoto);
+                    formData.append('public', this.editPublic);
                     editCompany(formData, this.$store.getters.token).then((res) => {
                         this.editLoading = false;
                         if (res.code == 200) {
@@ -1539,6 +1613,7 @@ export default {
             });
         },
         // editCompanyInfo() {},
+        //企业LOGO
         editLogoHandlePreview(file, fileList) {
             // this.editData.comp_Logo = ""editLogoFileList
             const isIMAGE1 = file.raw.type === 'image/png';
@@ -1559,14 +1634,16 @@ export default {
                 return false;
             }
             this.editLogo = fileList[0].raw;
+            console.log('editLogoHandlePreview', this.editPublic);
         },
         editCompLogo() {
-            // this.editLogo = ""
+            this.editLogo = '';
             this.islogoActive = true;
         },
         editLogoHandleRemove(file, fileList) {
             this.editLogo = '';
         },
+        //企业图片
         editPhotoHandlePreview(file, fileList) {
             const isIMAGE1 = file.raw.type === 'image/png';
             const isIMAGE2 = file.raw.type === 'image/gif';
@@ -1586,28 +1663,55 @@ export default {
                 return false;
             }
             this.editPhoto = fileList[0].raw;
+            console.log('editPhotoHandlePreview', this.editPhoto);
         },
         editPhotoHandleRemove(file, fileList) {
             this.editPhoto = '';
         },
         editCompPhoto() {
-            // this.editData.comp_Photo = ""
+            this.editPhoto = '';
             this.isPhotoActive = true;
+        },
+        //公众号上传
+        editPublicHandlePreview(file, fileList) {
+            const isIMAGE1 = file.raw.type === 'image/png';
+            const isIMAGE2 = file.raw.type === 'image/gif';
+            const isIMAGE3 = file.raw.type === 'image/jpg';
+            const isIMAGE4 = file.raw.type === 'image/jpeg';
+            const isIMAGE5 = file.raw.type === 'image/tiff';
+            const isLt1M = file.raw.size / 1024 / 1024 < 1.5;
+
+            if (!isIMAGE1 && !isIMAGE2 && !isIMAGE3 && !isIMAGE4 && !isIMAGE5) {
+                this.$message.error('只支持png,jpg,jpeg,tiff,gif格式的图片!');
+                this.editPublicFileList = [];
+                return false;
+            }
+            if (!isLt1M) {
+                this.$message.error('上传文件大小不能超过 1.5MB!');
+                this.editPublicFileList = [];
+                return false;
+            }
+            this.editPublic = fileList[0].raw;
+        },
+        editPublicHandleRemove(file, fileList) {
+            this.editPublic = '';
+        },
+        editCompPublic() {
+            this.editPublic = '';
+            this.isPublicActive = true;
         },
         chooseInstanceOne(val) {
             this.selectDataOne = val;
-
             if (val.length > 1) {
                 this.$refs.businessList.clearSelection();
                 this.$refs.businessList.toggleRowSelection(val.pop());
-            } else if (val.length == 1) {
+            } else if (val.length === 1 && val[0] !== null) {
                 this.infoCompCd = val[0].comp_CD;
                 this.infoComDeatils = val[0];
                 this.businessEnv = val[0].comp_CD;
                 this.envcomp_Name = val[0].comp_Name;
                 this.envcomp_Leader = val[0].comp_Leader;
                 this.envcomp_Buss_Scope = val[0].comp_Buss_Scope;
-
                 this.loadingInfo = true;
                 dataForCD(
                     {
@@ -1633,7 +1737,6 @@ export default {
         },
         chooseInstanceTwo(val) {
             this.selectDataTwo = val;
-
             this.dataEnvList = val;
             // if (val.length == 1) {
             //   if (val[0] != undefined) {
@@ -1682,14 +1785,14 @@ export default {
             this.editLoading = true;
             this.isPhotoActive = false;
             this.islogoActive = false;
+            this.isPublicActive = false;
             this.editCompany = row.comp_CD;
             this.editLogoFileList = [];
             this.editPhotoFileList = [];
-
+            this.editPublicFileList = [];
             compDetails({ compCD: row.comp_CD }, this.$store.getters.token).then((res) => {
                 this.editLoading = false;
                 this.editData.comp_ID = res[0].comp_ID;
-
                 this.editData.comp_Address = res[0].comp_Address;
                 this.editData.comp_Buss_Scope = res[0].comp_Buss_Scope;
                 this.editData.comp_CD = res[0].comp_CD;
@@ -1699,10 +1802,17 @@ export default {
                 this.editLogo = res[0].comp_Logo;
                 this.editData.comp_Name = res[0].comp_Name;
                 this.editPhoto = res[0].comp_Photo;
+                this.editPublic = res[0].comp_Public;
+                console.log('this', this.editPublic);
+                if (!this.editPublic || this.editPublic === '') {
+                    this.isPublicActive = true;
+                }
                 this.editData.comp_Simp_Name = res[0].comp_Simp_Name;
                 this.editData.comp_URL = res[0].comp_URL;
                 this.editData.cont_Phone = res[0].cont_Phone;
                 this.editData.leader_Phone = res[0].leader_Phone;
+                // this.editPublic =
+                //     'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1591014361473&di=704c2a76279147b0de4346e508014715&imgtype=0&src=http%3A%2F%2Fa3.att.hudong.com%2F14%2F75%2F01300000164186121366756803686.jpg';
             });
         },
         // edit() {
@@ -2190,6 +2300,7 @@ export default {
                 this.companyDetails = res[0];
                 this.logoSrc = res[0].comp_Logo;
                 this.compImgSrc = res[0].comp_Photo;
+                this.PublicSrc = res[0].comp_Public;
             });
         },
         openInfoDetails(dataCD) {
@@ -2456,7 +2567,6 @@ export default {
             this.loadingTwo = true;
             showUserMsgNotSuper(this.$store.getters.token).then((res) => {
                 this.loadingTwo = false;
-
                 this.businessList = res.msg;
                 this.totalNumOne = res.msg.length;
             });
@@ -2473,6 +2583,9 @@ export default {
         display: none;
     }
     .PhotoActive {
+        display: none;
+    }
+    .PublicActive {
         display: none;
     }
     &-info {

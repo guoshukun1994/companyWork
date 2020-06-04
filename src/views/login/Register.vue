@@ -175,6 +175,7 @@
                         style="width: 200px;"
                         placeholder="请输入密码"
                         type="password"
+                        auto-complete="new-password"
                     />
                 </el-form-item>
 
@@ -541,6 +542,11 @@ export default {
                 });
         },
         getPhoneCodeInfo() {
+            if (!this.registerForm.userPhone) return;
+            let reg = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+            if (!reg.test(this.registerForm.userPhone)) {
+                callback(new Error('请输入正确的手机号码格式!'));
+            }
             sendSms({ phoneNum: this.registerForm.userPhone }).then((res) => {
                 this.disabled = true;
                 const TIME_COUNT = 60;

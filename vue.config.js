@@ -41,7 +41,7 @@ module.exports = {
                 // target: `http://trace.moacchina.info`,
                 // target: `http://127.0.0.1:8003`,
                 // target: `http://192.168.199.13:8003`,
-                // target: `http://192.168.199.12:8003`,
+                // target: `http://192.168.199.13:8003`,
 
                 changeOrigin: true,
                 pathRewrite: {
