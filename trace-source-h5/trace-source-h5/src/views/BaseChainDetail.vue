@@ -1,14 +1,17 @@
 <template>
-    <div>
+    <div class="baseChainDetail">
         <MyHeader title="区块情况"></MyHeader>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
          <FirstInfoContainer title="基础链区块情况"
                             :indexArr="indexArr" 
                             :highIndex="highIndex"
                             :list="blockDetailList" 
                             :inputShow="inputShow"
                             @jumpTo="jumpTo"
+                            :loading="loading"
                             >
         </FirstInfoContainer>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
         <div class="infoContainer">
             <div class="second-title">基础链交易记录</div>
             <div class="traContent" v-for="(item,index) in transactionsList" :key="index">
@@ -27,6 +30,8 @@
 <script>
 import { getBlockHashMsg } from '../api/api';
 import { timestampToTime } from '@/utils/index';
+import { transform } from '@/utils/transform';
+
 export default {
     name: "baseChainDetail",
     data(){
@@ -35,6 +40,7 @@ export default {
             highIndex: 3,
             inputShow: true,
             transactionsList: [],
+            loading: true,
             blockHashMsgList: {
                 number: "",
                 timestamp: "",
@@ -56,9 +62,14 @@ export default {
         const { blockNumber}  = this.$route.query;
         console.log(blockNumber);
         getBlockHashMsg({blockNumber}).then((res)=> {
+
              this.blockHashMsgList = res.data;
              this.transactionsList = res.data.transactions;
-             console.log(res.data);
+
+             let jsonObj = res.data;
+             this.blockHashMsgList = transform(jsonObj);
+
+             this.loading = false;      //让loading框隐藏
         }).catch((e)=> {
              console.log('查询基础链区块情况失败',e);
         })
@@ -66,9 +77,14 @@ export default {
     watch: {
         "$route.query.blockNumber": function(newVal) {
             getBlockHashMsg({ blockNumber: newVal }).then(res => {
-                this.blockHashMsgList = res.data;
+
                 this.transactionsList = res.data.transactions;
-                console.log(res.data);
+                let transformJson = {};
+
+                let jsonObj = res.data;
+                this.blockHashMsgList = transform(jsonObj);
+
+                this.loading = false;      //让loading框隐藏
             });
         }
     },
@@ -79,7 +95,7 @@ export default {
                  {"出块时间": timestampToTime(this.blockHashMsgList.timestamp)},
                  {"区块哈希": this.blockHashMsgList.hash },
                  {"父块哈希": this.blockHashMsgList.parentHash },
-                 {"叔伯哈希": this.blockHashMsgList.uncles.length ? this.blockHashMsgList.uncles : '无' },
+                 {"叔伯哈希": this.blockHashMsgList.uncles },
                  {"矿工": this.blockHashMsgList.miner },
                  {"难度": this.blockHashMsgList.difficulty },
                  {"总难度": this.blockHashMsgList.totalDifficulty },
@@ -94,7 +110,7 @@ export default {
         toBaseChainInfo(item){
             this.$router.push({path: '/baseChainInfo', query: {txHash: item}})
         },
-        jumpTo(index){
+        jumpTo($event,index){
             if(index === 3)
             this.$router.push({path: "/baseChainDetail",query:{blockNumber:this.blockHashMsgList.number - 1}})
         }

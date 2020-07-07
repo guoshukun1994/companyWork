@@ -13,7 +13,7 @@
           <el-image style="width:100%; height: 100%" :src="codeDetail.comp_Logo" fit="cover" :lazy="true" />
         </div>
         <div class="info">
-          <div class="barCode">溯源码：{{ code }}</div>
+          <div class="barCode">溯源码：{{ codeDetail.code }}</div>
           <div class="sts">
             状态：
             <span class="status">{{ codeDetail.consume_Status | getStatus }}
@@ -23,7 +23,7 @@
       </div>
       <div class="detail">
         <div>出厂存证</div>
-        <div class="hash" @click="toBaseChainInfo">
+        <div class="hash" @click="toBaseChainInfo(codeDetail.reg_hash)">
           {{ codeDetail.reg_hash }}
         </div>
         <img src="../assets/bigger.png" alt="" @click="openDialog(codeDetail.reg_hash)" />
@@ -34,7 +34,7 @@
       </div>
       <div class="detail">
         <div>消费存证</div>
-        <div v-if="codeDetail.consume_Hash" class="hash">
+        <div v-if="codeDetail.consume_Hash" class="hash" @click="toBaseChainInfo(codeDetail.consume_Hash)">
           {{ codeDetail.consume_Hash }}
         </div>
         <div v-else>未被扫码消费</div>
@@ -120,6 +120,7 @@
     <!-- <div class="wx_share">
         <el-button type="primary" @click="getAccess">分享</el-button>
     </div> -->
+    <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
     <div class="qr_code">更多详情请识别下方二维码</div>
     <div :class="codeDetail.comp_Public ? 'jumpToOthers' : 'jumpNoPublic'">
         <div v-if="codeDetail.comp_Public ? true : false">
@@ -165,13 +166,13 @@
         <div>企业地址</div>
         <div>{{ codeDetail.comp_Address }}</div>
       </div>
-      <div class="detail">
+      <div class="detail2">
         <div>经营范围</div>
         <div>{{ codeDetail.comp_Buss_Scope }}</div>
       </div>
-      <div class="detail">
+      <div class="detail2">
         <div>企业描述</div>
-        <div>{{ codeDetail.comp_Describe }}</div>
+        <div @click="showInput" :class="inputShow ? 'inputData' : ''">{{ codeDetail.comp_Describe }}</div>
       </div>
       <div class="second-title">企业追溯档案</div>
       <div class="contentNav" @click="toCompInfoPage">
@@ -197,21 +198,22 @@ import { getGoods,getAccessToken } from "@/api/api";
 export default {
     name: "CheckCode",
     created() {
-
+     
         //在页面加载时读取sessionStorage里的状态信息
         if(sessionStorage.getItem("storedata") ) {
-        this.$store.replaceState(Object.assign({}, this.$store.state,JSON.parse(sessionStorage.getItem("storedata"))));
+          this.$store.replaceState(Object.assign({}, this.$store.state,JSON.parse(sessionStorage.getItem("storedata"))));
         }
         //在页面刷新时将vuex里的信息保存到sessionStorage里
         window.addEventListener("beforeunload",()=>{
-        sessionStorage.setItem("storedata",JSON.stringify(this.$store.state))
+          sessionStorage.setItem("storedata",JSON.stringify(this.$store.state))
         });
         // 兼容iphone手机
         window.addEventListener("pagehide",()=>{
-        sessionStorage.setItem("storedata",JSON.stringify(this.$store.state))
+          sessionStorage.setItem("storedata",JSON.stringify(this.$store.state))
         });
         this.codeDetail = this.$store.state.app.codeDetailList.list;
-        console.log('compPhoto',this.codeDetail.comp_Photo);
+        console.log(this.codeDetail);
+        
         
     },
     mounted() {
@@ -220,12 +222,13 @@ export default {
     },
     data() {
         return {
+            inputShow: true,
             pub_url: "",
             miniProgram_url: "",
             dialogVisible: false,
-            code: "",
             hash: "",
             codeDetail: {
+                code: "",
                 check_code: "",
                 comp_Address: "",
                 comp_Buss_Scope: "",
@@ -319,6 +322,9 @@ export default {
         }
     },
     methods: {
+        showInput(){
+            this.inputShow = !this.inputShow;
+        },
         getAccess: function(){
             getAccessToken().then(res => {
                 console.log('res+++++++');
@@ -333,8 +339,8 @@ export default {
             this.dialogVisible = false;
         },
         //跳转至基础链交易情况页面
-        toBaseChainInfo() {
-            this.$router.push({ path: "/baseChainInfo", query: { txHash: this.codeDetail.reg_hash }});
+        toBaseChainInfo(txHash) {
+            this.$router.push({ path: "/baseChainInfo", query: { txHash }});
         },
         //跳转至应用链交易情况页面
         toApplicationTra(hash) {
@@ -386,7 +392,7 @@ export default {
     .base {
         display: flex;
         flex-direction: column;
-        font-size: 0.14rem;
+        font-size: 14px;
         background: #fff;
         .code {
             width: 100%;
@@ -435,7 +441,7 @@ export default {
             display: flex;
             flex-direction: row;
             justify-content: space-around;
-            font-size: 0.12rem;
+            font-size: 12px;
             div {
                 text-align: center;
                 img {
@@ -475,13 +481,13 @@ export default {
         text-align: center;
         line-height: 0.48rem;
         flex: 1;
-        font-size: 0.18rem;
+        font-size: 18px;
     }
 }
 .qr_code {
     padding-top: 0.1rem;
     color: #32312d;
-    font-size: 0.14rem;
+    font-size: 14px;
     text-align: center;
 }
 .jumpToOthers {

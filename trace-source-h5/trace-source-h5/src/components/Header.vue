@@ -35,9 +35,10 @@ export default {
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 0.16rem;
+        font-size: 16px;
         .backLeft {
             display: flex;
+            align-items: center;
             position: absolute;
             left: 0.19rem;
              .backBtn {

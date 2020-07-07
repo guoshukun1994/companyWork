@@ -1,6 +1,7 @@
 <template>
     <div>
         <MyHeader title="区块情况"></MyHeader>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
          <FirstInfoContainer title="应用链区块情况"
                             :indexArr="indexArr" 
                             :highIndex="highIndex"
@@ -9,6 +10,7 @@
                             @jumpTo="jumpTo"
                             >
         </FirstInfoContainer>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
         <div class="infoContainer">
             <div class="second-title">应用链交易记录</div>
             <div class="traContent" v-if="!subBlockHashMsgList.Txs.length">
@@ -31,6 +33,7 @@
 <script>
 import { getSubBlockHashMsg, getSubTxHashMsg } from '../api/api';
 import { timestampToTime } from '@/utils/index';
+import { transform } from '@/utils/transform';
 export default {
     name: "applicationDetail",
     data(){
@@ -54,6 +57,10 @@ export default {
         const { blockNumber } = this.$route.query;
         getSubBlockHashMsg({subBlockNumber: blockNumber}).then( res => {
             this.subBlockHashMsgList = res.data;
+            console.log('res.data',res.data);
+            let jsonObj = res.data;
+            this.subBlockHashMsgList = transform(jsonObj);
+            console.log('this.subBlockHashMsgList',this.subBlockHashMsgList);
         }).catch((e)=> {
             console.log('查询应用区块情况失败',e);
         })
@@ -62,6 +69,10 @@ export default {
         "$route.query.blockNumber": function(newVal) {
             getSubBlockHashMsg({ subBlockNumber: newVal }).then( res => {
                 this.subBlockHashMsgList = res.data;
+                console.log('res.data',res.data);
+                let jsonObj = res.data;
+                this.subBlockHashMsgList = transform(jsonObj);
+                console.log('this.subBlockHashMsgList',this.subBlockHashMsgList);
             }).catch((e)=> {
                 console.log('查询应用区块情况失败',e);
             })
@@ -76,7 +87,7 @@ export default {
                  {"父块哈希": this.subBlockHashMsgList.parentHash },
                  {"矿工": this.subBlockHashMsgList.miner },
                  {"附加数据": this.subBlockHashMsgList.extraData },
-                 {"交易数据": this.subBlockHashMsgList.Txs.length ? this.subBlockHashMsgList.Txs.length : 0 },
+                 {"交易数据": this.subBlockHashMsgList.Txs.length},
             ]
         }
     },

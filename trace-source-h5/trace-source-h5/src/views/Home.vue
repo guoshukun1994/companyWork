@@ -13,6 +13,9 @@ import { getCodeStatu, getGoods } from "../api/api";
 // @ is an alias to /src
 export default {
   name: "Home",
+  created() {
+    sessionStorage.removeItem("storedata");
+  },
   mounted() {
     if (this.$route.query.code) {
       const code = this.$route.query.code;
@@ -23,6 +26,8 @@ export default {
             getGoods({ code }).then(res => {
 
               this.codeDetail = res.data;
+              this.codeDetail.code = code;
+              console.log('this.codeDetail',this.codeDetail);
               
               this.$store.commit({
                   type: "app/toCodeDetail",

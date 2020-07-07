@@ -1,6 +1,7 @@
 <template>
     <div>
         <MyHeader :title="title"></MyHeader>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
         <ShowContainer title1="商品信息" :title2="title" :photoList="goodsPhotoList" :highIndex="highIndex"></ShowContainer>
     </div>
 </template>

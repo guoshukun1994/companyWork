@@ -1,7 +1,8 @@
 <template>
     <div>
         <MyHeader :title="title"></MyHeader>
-        <ShowContainer title1="企业信息" :title2="title" :photoList="companyPhotoList" :showIndex="5"></ShowContainer>
+        <div style="width:100%;height: 0.1rem;background: #F6F6F6;"></div>
+        <ShowContainer title1="企业信息" :title2="title" :photoList="companyPhotoList" :showIndex="5" :inputShow="inputShow"></ShowContainer>
     </div>
 </template>
 
@@ -12,6 +13,7 @@ export default {
     data(){
         return {
             companyPhotoList: [],
+            inputShow: true,
             title: ""
         }
     },
@@ -28,6 +30,6 @@ export default {
             console.log(res.data);
         })
         
-    }
+    },
 }
 </script>

@@ -4,10 +4,9 @@
             <div class="first-title">{{ title1 }}</div>
             <div class="showDetail" v-for="(item,index) in list" :key="index">
                 <div>{{ item.title }}</div>
-                <div :class="highIndex && index === highIndex ? 'highRed' : ''">{{ item.value }}</div>
+                <div :class="{ 'highRed': index === highIndex, 'inputData': index === showIndex && inputSts }" @click="showInput(index)">{{ item.value }}</div>
             </div>
         </div>
-
         <div class="botContent">
             <div class="first-title">{{ title2 }}</div>
             <Copy :dialogVisible="dialogVisible" :hash="hash" @close="close"></Copy>
@@ -31,14 +30,17 @@ export default {
         return {
             dialogVisible: false,
             hash: "",
-            list: []
+            list: [],
+            inputSts: this.inputShow
         }
     },
     props: {
         title1: String,
         title2: String,
         highIndex: Number,
-        photoList: Array
+        photoList: Array,
+        showIndex: Number,
+        inputShow: Boolean
     },
     created() {
         if(this.title1 === "商品信息"){
@@ -48,6 +50,10 @@ export default {
         }
     },
     methods: {
+        showInput(index){
+            if(index === this.showIndex)
+            this.inputSts = !this.inputSts;
+        },
         openDialog(hash) {
             this.dialogVisible = true;
             this.hash = hash;
@@ -67,9 +73,9 @@ export default {
     .showDetail {
         display: flex;
         flex-direction: row;
-        align-items: center;
+        // align-items: center;
         line-height: 0.24rem;
-        font-size: 0.14rem;
+        font-size: 14px;
         padding-right: 0.145rem;
         .highRed {
             color: #F35631 !important;
@@ -112,7 +118,7 @@ export default {
                 width: 88%;
                 padding: 0 0.15rem 0 0.14rem;
                 margin-bottom: 0.05rem;
-                font-size: 0.14rem;
+                font-size: 14px;
                 .highTxt{
                     color: #337AB7;
                     overflow: hidden;

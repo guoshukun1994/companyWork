@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <router-view />
+        <div class="app-main"><router-view /></div>
         <div class="bottom">
             <div>技术支持-墨客井链数字科技</div>
             <div>Copyright 2019-2025 All Reserved</div>
@@ -24,6 +24,12 @@
     background: #f6f6f6;
     display: flex;
     flex-direction: column;
+    .app-main {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: white;
+    }
     .bottom {
         width: 100vw;
         padding: 10px 0;

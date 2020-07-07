@@ -5,7 +5,7 @@
   flex-direction: row;
   align-items: center;
   line-height: 0.24rem;
-  font-size: 0.14rem;
+  font-size: 14px;
   div:nth-child(1) {
     text-align: right;
     width: 0.6rem;
@@ -28,12 +28,33 @@
     margin: 0 0.18rem 0 0.08rem;
   }
 }
+.detail2 {
+  display: flex;
+  flex-direction: row;
+  // align-items: center;
+  // justify-content: center;
+  line-height: 0.24rem;
+  font-size: 14px;
+  margin-left: 0.04rem;
+  padding-right: 0.18rem;
+  div:nth-child(1) {
+    // width: 0.6rem;
+    height: 0.24rem;
+    margin: 0 0.15rem;
+    color: #777777;
+    white-space: nowrap;
+  }
+  div:nth-child(2) {
+    color: #32312d;
+    // margin-left: 0.01rem;
+  }
+}
 .hashDetail {
   display: flex;
   flex-direction: row;
   align-items: center;
   line-height: 0.24rem;
-  font-size: 0.14rem;
+  font-size: 14px;
   div:nth-child(1) {
     text-align: right;
     width: 0.4rem;
@@ -61,7 +82,7 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.18rem;
+  font-size: 18px;
 }
 .first-title::after {
   content: "";
@@ -89,7 +110,7 @@
   flex-direction: row;
   align-items: center;
   font-weight: bold;
-  font-size: 0.16rem;
+  font-size: 16px;
 }
 .second-title::before {
   content: "";
@@ -107,3 +128,14 @@
   height: 0.1rem;
 }
 //message提示框
+
+//文字显示过长超过三行用省略号表示
+.inputData {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+
